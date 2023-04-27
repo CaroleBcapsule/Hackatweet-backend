@@ -26,14 +26,14 @@ router.post("/signup", (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, 10);
       //creation de l'utilisateur
       const newUser = new User({
-        firstname: req.body.name,
-        username: req.body.email,
+        firstname: req.body.firstname,
+        username: req.body.username,
         password: hash,
         token: uid2(32),
       });
       //enregistrement dans la BDD
       newUser.save().then((newUserRegistred) => {
-        res.json({ result: true, token: newUserRegistred });
+        res.json({ result: true, user: newUserRegistred });
       });
     } else {
       // Nom d'utilisateur deja pris
