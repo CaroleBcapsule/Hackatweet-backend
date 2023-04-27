@@ -10,10 +10,10 @@ const fetch = require('node-fetch');
 //Post
 router.post('/tweets', function (req, res){
     const newTweet = new Tweet({
-        author: req.body.author
+        author: req.body.author,
         content: req.body.content,
-        date: req.body.content
-        like: req.body.like
+        date: req.body.content,
+        like: req.body.like,
        });
   
     newTweet.save()
