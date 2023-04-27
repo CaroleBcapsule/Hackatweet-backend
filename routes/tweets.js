@@ -1,46 +1,59 @@
 var express = require('express');
 var router = express.Router();
-
+const fetch = require('node-fetch');
+var moment = require('moment');
+const { ISO_8601 } = require('moment');
 
 require('../models/connection');
 const Tweet = require('../models/tweets');
-const fetch = require('node-fetch');
+const User = require("../models/users");
 
-
-//Post
-router.post('/tweets', function (req, res){
+//Post si l'utiliateur est connecté
+router.post('/newTweet/:token', function (req, res){
+    User.findOne({ token: req.params.token }).then((data) => {
+    if (data) {
+        console.log(req.params.token)
+        console.log(req.body.username)
     const newTweet = new Tweet({
-        author: req.body.id,
+        author: data._id,
         content: req.body.content,
-        date: req.body.content,
-        like: req.body.id,
+        date: new (Date),
+        like: [],
        });
-  
-    newTweet.save()
-    .then(()=> {
-      Tweet.find().then(data => {res.json({ allTweets: data });
-  });
+    newTweet.save().then((newTweet)=> {res.json({ result: true, newTweet: newTweet }); });
+  }
+  else
+  {res.json({ result: false, error: "Can't tweet" });}
+
   });})
   
-  //get
-  router.get('/tweets', (req, res) => {
-  
-    Tweet.find()
-    .then(data => {res.json({ allTweets: data});
+
+
+  //Get si l'utilisateur est connecté = get de tous les tweets de tous les utilisateurs
+  router.get('/tweets/:token', (req, res) => {
+    User.findOne({ token: req.params.token }).then((data) => {
+        if (data) {
+            Tweet.find()
+    .then(data => {res.json({ result: true, allTweets: data});})}
+    else {
+        {res.json({ result: false, error: "User not connected" });}
+    }});
   });
-  });
   
-//   router.get('/lastTrip', (req, res) => {
-//     Trip.find()
-//     .then(data => {res.json({ lastTrip: data[data.length -1]});
-//   });
-//   });
+
+// Delete du tweet de l'utlisateur connecté
+  router.delete('/deleteTweet/:token/:_id', (req, res) => {
+    User.findOne({ token: req.params.token }).then(data => {
+        if(data) {
+        Tweet.deleteOne({_id : req.params._id})
+            .then(deletedTweet =>{res.json({ result: true, deletedTweet : deletedTweet  })})
+            }
+        else{res.json({ result: false, error: 'User not found' });}
+  });});
   
-  router.delete('/tweets', (req, res) => {
-    Tweet.deleteMany()
-    .then(()=> {Trip.find().then(data =>{res.json({ allTweets: data })})
-  //par token connecté son propre 
-  });})
-  
+
+
+
+
   module.exports = router;
   
