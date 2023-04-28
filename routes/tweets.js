@@ -12,8 +12,6 @@ const User = require("../models/users");
 router.post('/newTweet/:token', function (req, res){
     User.findOne({ token: req.params.token }).then((data) => {
     if (data) {
-        console.log(req.params.token)
-        console.log(req.body.username)
     const newTweet = new Tweet({
         author: data._id,
         content: req.body.content,
