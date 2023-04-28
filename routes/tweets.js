@@ -13,7 +13,7 @@ router.post("/newTweet/:token", function (req, res) {
   User.findOne({ token: req.params.token }).then((data) => {
     if (data) {
       const newTweet = new Tweet({
-        author: data._id,
+        author: [data.username],
         content: req.body.content,
         date: new Date(),
         like: [],
@@ -29,7 +29,9 @@ router.post("/newTweet/:token", function (req, res) {
 
 //Get si l'utilisateur est connecté = get de tous les tweets de tous les utilisateurs
 router.get("/:token", (req, res) => {
-  User.findOne({ token: req.params.token }).then((data) => {
+  User.findOne({ token: req.params.token })
+  .populate('author')
+  .then((data) => {
     if (data) {
       Tweet.find().then((data) => {
         res.json({ result: true, allTweets: data });
